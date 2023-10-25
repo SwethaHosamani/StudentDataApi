@@ -58,7 +58,7 @@ namespace TestApplication.Controllers
             return BadRequest(ModelState);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("updateStudentData/{id}")]
         public IActionResult Put(string id, [FromBody] Student student)
         {
             bool success = _studentDAO.UpdateStudent(
@@ -89,7 +89,7 @@ namespace TestApplication.Controllers
         }
 
 
-        [HttpGet("{id}")]
+        [HttpGet("getStudentDataById/{id}")]
         public IActionResult Get(string id)
         {
             Student student = _studentDAO.GetStudentByID(id);
@@ -104,7 +104,7 @@ namespace TestApplication.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("deleteStudentData/{id}")]
         public IActionResult Delete(string id)
         {
             bool success = _studentDAO.DeleteStudentByID(id);
