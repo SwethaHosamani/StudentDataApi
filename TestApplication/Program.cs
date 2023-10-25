@@ -96,10 +96,9 @@
 
 
 
-using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 using TestApplication.Models;
 using TestApplication.DataAccess;
 
@@ -114,21 +113,24 @@ namespace TestApplication
             builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
             builder.Services.AddControllers();
-            builder.Services.AddTransient<StudentDAO>(_ => new StudentDAO(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddTransient<StudentDAO>(_ => new StudentDAO(
+                builder.Configuration.GetConnectionString("DefaultConnection"),
+                builder.Configuration.GetConnectionString("RecoveryConnection")
+            ));
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(builder =>
                 {
-                    // builder.WithOrigins("http://127.0.0.1:5500") 
                     builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader();
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
                 });
             });
-            var app = builder.Build();
 
+            var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
             {
@@ -138,7 +140,7 @@ namespace TestApplication
 
             app.UseHttpsRedirection();
             app.UseAuthorization();
-            app.UseCors();  
+            app.UseCors();
             app.MapControllers();
 
             app.Run();

@@ -1,18 +1,25 @@
 ﻿
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Vml.Office;
+using DocumentFormat.OpenXml.Wordprocessing;
 using System;
 using System.Data;
 using System.Data.SqlClient;
 using TestApplication.Models;
+using DataTable = System.Data.DataTable;
 
 namespace TestApplication.DataAccess
 {
     public class StudentDAO
     {
         private readonly string _connectionString;
+        private readonly string _recoveryConnectionString;
 
-        public StudentDAO(string connectionString)
+        public StudentDAO(string connectionString, string recoveryConnectionString)
         {
             _connectionString = connectionString;
+            _recoveryConnectionString = recoveryConnectionString;
         }
 
         public bool InsertStudent(
@@ -183,6 +190,39 @@ namespace TestApplication.DataAccess
                 }
             }
         }
+        public System.Data.DataTable GetAllStudentsAsDataTable()
+        {
+            System.Data.DataTable dataTable = new System.Data.DataTable();
 
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                using (SqlCommand command = new SqlCommand("SELECT * FROM StudentData", connection))
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                {
+                    adapter.Fill(dataTable);
+                }
+            }
+
+            return dataTable;
+        }
+
+        public void TruncateStudentTable()
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand command = new SqlCommand("TRUNCATE TABLE Student2", connection))
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+       
     }
 }
+
+
+
